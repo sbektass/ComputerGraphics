@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<style>
+.Slider{
+background: DeepSkyBlue;
+  border: solid 1px #9370DB;
+  border-radius: 8px;
+  height: 7px;
+  width: 150px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.Slider::-webkit-slider-thumb {
+  width: 6px;
+  -webkit-appearance: none;
+  height: 12px;
+  	background: #9370db;
+  border-radius: 2px;
+}
+	
+.block1905{
+	vertical-align:top;
+	height:300px;
+	width: 450px;
+	display: inline-block;
+)
+table, th, td {
+  border: 2px solid black;
+}
+</style>
+<br><br><br>
+<canvas id="gl-canvas" width="512" height="512"></canvas>
+<div class="block1905">
+<br><br><br><br><br><br><br><br>
+<span style = "color:MediumPurple">Işığın Konumu<br>
+<label for="number"><span style = "color:MediumPurple">X</label>
+<input type="range" min="-10" max="10" id="lPosX" step="1" class="Slider" value="1">
+<br>
+<label for="number"><span style = "color:MediumPurple">Y</label>
+<input type="range" min="-10" max="10" id="lPosY" step="1" class="Slider" value="2">
+<br>
+<label for="number"><span style = "color:MediumPurple">Z</label>
+<input type="range" min="-10" max="10" id="lPosZ" step="1" class="Slider" value="2">
+<br><br><br>
+</div>
+<div class="block1905">
+<br><br><br><br>
+<button id = "XButton" style="width:150px;height:50px; background-color:MediumPurple;color:white">X Ekseni Etrafında Döndürme</button>
+<button id = "NXButton"style="width:150px;height:50px;background-color:MediumPurple;color:white">X Ekseninin Tersine Döndürme</button>
+<br>
+<br>
+<button id = "YButton"style="width:150px;height:50px;background-color:MediumPurple; color:white">Y Ekseni Etrafında Döndürme</button>
+<button id = "NYButton"style="width:150px;height:50px;background-color:MediumPurple; color:white">Y Ekseninin Tersine Döndürme</button>
+<br>
+<br>
+<button id = "ZButton"style="width:150px;height:50px;background-color:MediumPurple; color:white">Z Ekseni Etrafında Döndürme</button>
+<button id = "NZButton"style="width:150px;height:50px;background-color:MediumPurple; color:white">Z Ekseninin Tersine Döndürme</button>
+<br>
+<br>
+<button id = "WireframeButton"style="width:150px;height:50px;background-color:MediumPurple; color:white">Telkafes Model</button>
+<button id = "ModelButton"style="width:150px;height:50px;background-color:MediumPurple; color:white">Doku ile Kaplı Model</button>
+<br><br>
+<button id = "DesenEkle"style="width:150px;height:50px;background-color:MediumPurple; color:white">Desen Ekle</button>
+<button id = "DesenCikar"style="width:150px;height:50px;background-color:MediumPurple; color:white">Desen Çıkar</button>
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute vec3 vNormal;
+attribute vec2 texCoord;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 normalMatrix;
+
+varying vec3 normalInterp;
+varying vec3 vertPos;
+varying highp vec2 vTexCoord;
+
+void main()
+{
+	vec4 vertPos4 = modelViewMatrix * vPosition;
+	vertPos = vec3(vertPos4) / vertPos4.w;
+	normalInterp = mat3(normalMatrix) * vNormal;
+	
+    gl_Position = projectionMatrix*modelViewMatrix*vPosition;
+	
+	vTexCoord = texCoord;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec3 normalInterp;  
+varying vec3 vertPos;      
+varying highp vec2 vTexCoord;
+
+uniform sampler2D texmap;
+
+uniform float Ka; 
+uniform float Kd;   
+uniform float Ks;   
+uniform float shininess;
+
+uniform vec3 ambientColor;
+uniform vec3 diffuseColor;
+uniform vec3 specularColor;
+uniform vec3 lightPos;
+
+
+
+void main() {
+  vec3 N = normalize(normalInterp);
+  vec3 L = normalize(lightPos-vertPos);
+
+  float lambertian = max(dot(N, L),0.0);
+  float specular = 0.0;
+  if(lambertian>0.0)
+  {
+    vec3 R = reflect(-L, N);     
+    vec3 V = normalize(-vertPos); 
+	
+    float specAngle =max(dot(R, V),0.0);
+    specular = pow(specAngle, shininess);
+  }
+  
+	vec4 texColor = texture2D(texmap, vTexCoord);
+	vec3 ambient=Ka * ambientColor;
+	vec3 diffuse=Kd * lambertian * diffuseColor * texColor.rgb;
+	vec3 specular2= Ks * specular * specularColor;
+  
+  gl_FragColor = vec4(ambient+diffuse+specular2, 1.0);
+}
+</script>
+<script src="webgl-utils.js"></script>
+<script src="initShaders.js"></script>
+<script src="MV.js"></script>
+<script src="PhongShading.js"></script>
+
+</html>
