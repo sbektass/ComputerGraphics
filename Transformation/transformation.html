@@ -1,0 +1,251 @@
+<html>
+<style>
+
+.XSlider{
+background:DeepSkyBlue;
+  border: solid 1px #9370DB;
+  border-radius: 8px;
+  height: 7px;
+  width: 150px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.xSlider::-webkit-slider-thumb {
+  width: 6px;
+  -webkit-appearance: none;
+  height: 12px;
+  	background: #9370db;
+  border-radius: 2px;
+}
+
+
+.YSlider{
+background: DeepSkyBlue;
+  border: solid 1px #9370DB;
+  border-radius: 8px;
+  height: 7px;
+  width: 150px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.YSlider::-webkit-slider-thumb {
+  width: 6px;
+  -webkit-appearance: none;
+  height: 12px;
+  	background: #9370db;
+  border-radius: 2px;
+}
+
+
+
+.ScalerSlider{
+background:DeepSkyBlue;
+  border: solid 1px #9370DB;
+  border-radius: 8px;
+  height: 7px;
+  width: 150px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.ScalerSlider::-webkit-slider-thumb {
+  width: 6px;
+  -webkit-appearance: none;
+  height: 12px;
+  	background: #9370db;
+  border-radius: 2px;
+}
+
+
+.RSlider{
+  background: linear-gradient(to right, rgb(0,0,0) , rgb(255,0,0) );
+  border:thick silver solid 1px ;
+  border-radius: 8px;
+  height: 12px;
+  width: 180px;
+  outline: none;
+  transition: background 450ms ease-in;
+  -webkit-appearance: none;
+}
+.RSlider::-webkit-slider-thumb {
+  width: 6px;
+  -webkit-appearance: none;
+  height: 12px;
+  	background: #708090;
+  border-radius: 2px;
+}
+
+
+
+.GSlider{
+  background: linear-gradient(to right, rgb(0,0,0) , rgb(0,255,0) );
+  border:thick silver solid 1px #82CFD0;
+  border-radius: 8px;
+  height: 12px;
+  width: 180px;
+  outline: none;
+  transition: background 450ms ease-in;
+  -webkit-appearance: none;
+}
+
+.GSlider::-webkit-slider-thumb {
+  width: 6px;
+  -webkit-appearance: none;
+  height: 12px;
+  	background: #708090;
+  border-radius: 2px;
+}
+
+.BSlider{
+  background: linear-gradient(to right, rgb(0,0,0) , rgb(0,0,255) );
+  border:thick silver solid 1px #82CFD0;
+  border-radius: 8px;
+  height: 12px;
+  width: 180px;
+  outline: none;
+  transition: background 450ms ease-in;
+  -webkit-appearance: none;
+}
+.BSlider::-webkit-slider-thumb {
+  width: 6px;
+  -webkit-appearance: none;
+  height: 12px;
+  	background: #708090;
+  border-radius: 2px;
+}
+
+
+.block1905{
+	vertical-align:top;
+	height:300px;
+	width: 450px;
+	display: inline-block;
+)
+table, th, td {
+  border: 2px solid black;
+}
+
+</style>
+<script id="vertex-shader" type="x-shader/x-vertex">
+   attribute vec4 vPosition;
+   uniform vec3 s_translate;
+   uniform mat4 sscale_matrix;
+   uniform mat4 s_rotation;
+   vec4 scale_s;//olceklendirme islemi icin gecici degisken
+   vec4 rotate_s;//olceklendirmeden sonra dondurma islemini de uyguladıktan sonra tutulan degisken
+   
+   void main(){
+   
+   //Olceklendirme
+   scale_s = sscale_matrix*vPosition;
+		
+	//Dondurme
+	rotate_s = s_rotation *scale_s;
+		
+	//Oteleme
+	gl_Position = rotate_s+ vec4(s_translate,0.0);
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment"> 
+   precision mediump float;
+   uniform vec4 f_color;
+   void main() {
+     gl_FragColor = f_color;
+   }
+</script>
+<script src="webgl-utils.js"></script>
+<script src="initShaders.js"></script>
+<script src="MV.js"></script>
+<script src="transformation.js"></script>
+
+<body>
+<canvas id="gl-canvas" width="700" height="400"></canvas><div class="block1905">
+<div>
+<br><br><br>
+<span style="white-space: pre">                     </span>
+X Konumu<span style="white-space: pre">     </span>-1<input  type="range"
+min="-1" max="1" step="0.1" value="0" id="xkonumslider" class="XSlider" />1
+
+</div>
+<div>
+<span style="white-space: pre">                     </span>
+Y Konumu<span style="white-space: pre">     </span>-1<input id="ykonumslider" class="YSlider" type="range"
+min="-1" max="1" step="0.1" value="0" />
+1 </div>
+<br>
+<div>
+<span style="white-space: pre">                     </span>
+Ölçeklendirme<span style="white-space: pre"> </span>1<input id="olceklendirme" type="range" class="ScalerSlider"
+min="0.1" max="2" step="0.1" value="1" />2
+<span style="white-space: pre">     </span>
+</div>
+<br><br><br>
+<span style="white-space: pre">                       </span>
+<select id="Dondurme" size="2">
+	<option value="0"style="background-color:MediumPurple; color:white">Saat Yönünde Döndürme</option>
+	<option value="1"style="background-color:MediumPurple; color:white">Saat Yönünün Tersine Döndürme</option>	
+</select><br></div>
+
+<div class="block1905">
+<p>Harflerin Rengini Değiştirme<p/>
+<span style="white-space: pre">    </span>
+Kırmızı(R)   0<input id="Red" type="range" class="RSlider"
+min="0" max="1" step="0.01" value="0" />1 <br> 
+<span style="white-space: pre">       </span>
+Yeşil(G) 0 <input id="Green" type="range"  class="GSlider"
+min="0" max="1" step="0.00001" value="0" />1 <br>
+<span style="white-space: pre">       </span>
+Mavi(B) 0    <input id="Blue" type="range" class="BSlider"
+min="0" max="1" step="0.01" value="0" />1 
+<span style="white-space: pre">   </span>
+<button id = "renk"style="background-color:MediumPurple; color:white">Uygula</button> 
+
+</div>
+<div class="block1905">
+<p>Canvasın Rengini Değiştirme</p>
+<select id = "canvasmenu" size = "8">
+    <option value = "0"style="background-color:MediumPurple; color:white">Siyah</option>
+    <option value = "1"style="background-color:MediumPurple; color:white">Kırmızı</option>
+    <option value = "2"style="background-color:MediumPurple; color:white">Sarı</option>
+    <option value = "3"style="background-color:MediumPurple; color:white">Yeşil</option>
+    <option value = "4"style="background-color:MediumPurple; color:white">Mavi</option>
+    <option value = "5"style="background-color:MediumPurple; color:white">Mor</option>
+    <option value = "6"style="background-color:MediumPurple; color:white">Turkuaz</option>
+	<option value = "7"style="background-color:MediumPurple; color:white">Beyaz</option>
+</select>
+<button id = "Button3"style="background-color:MediumPurple; color:white">Uygula</button> </div>
+
+<div class="block1905">
+<table>
+  <tr>
+    <th>Kısayol</th>
+    <th>Eylem</th>
+  </tr>
+  <tr>
+    <td>A,D,W,S</td>
+    <td>Öteleme</td>
+  </tr>
+  
+   <tr>
+    <td>Sağ/Sol Yön Tuşu</td>
+    <td>Saat Yönünde/Tersine Döndürme </td>
+  </tr>
+  
+       <tr>
+    <td>K</td>
+    <td>Harfleri Kırmızıya Boyama</td>
+  </tr>
+         <tr>
+    <td>M</td>
+    <td>Harfleri Maviye Boyama</td>
+  </tr>
+         <tr>
+    <td>Y</td>
+    <td>Harfleri Yeşile Boyama</td>
+  </tr>
+  
+</table>
+</div>
+</body>
+</html>
